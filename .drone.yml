@@ -13,7 +13,7 @@ pipeline:
   test-ecr:
     image: trinitymirror/drone-cloudformation
     stackname: newdronetest
-    template: ecr/default.yml
+    template: aws/ecr.yml
     when:
       event: deployment
 
