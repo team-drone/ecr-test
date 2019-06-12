@@ -7,8 +7,6 @@ pipeline:
     batch:
       - mode: validate
         template: aws/ecr.yml
-      - mode: validate
-        template: aws/infrastructure.yml
     when:
       event: push
 

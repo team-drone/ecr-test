@@ -2,23 +2,51 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
 Parameters:
-  Environment:
+  RepositoryName:
     Type: String
-    AllowedValues:
-      - bertha
-      - stable
-      - prod
 
 Resources:
   ECR:
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: com.reachplc/ecr-test
-      'Fn::Transform':
-        Name: 'AWS::Include'
-        Parameters:
-          Location: !Sub s3://uj-cf-snippets-${Environment}/ecr/accessPolicy/default.yml
-      'Fn::Transform':
-        Name: 'AWS::Include'
-        Parameters:
-          Location: !Sub s3://uj-cf-snippets-${Environment}/ecr/lifecyclePolicy/default.yml
+      RepositoryName: newdronetestrepo
+      RepositoryPolicyText:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: GrantCrossAccount
+            Effect: Allow
+            Principal:
+              AWS:
+                - 'arn:aws:iam::743677148328:root'
+            Action:
+              - 'ecr:GetDownloadUrlForLayer'
+              - 'ecr:BatchGetImage'
+              - 'ecr:BatchCheckLayerAvailability'
+              - 'ecr:PutImage'
+              - 'ecr:DescribeImages'
+              - 'ecr:GetAuthorizationToken'
+              - 'ecr:DescribeRepositories'
+              - 'ecr:ListImages'
+              - 'ecr:InitiateLayerUpload'
+              - 'ecr:UploadLayerPart'
+              - 'ecr:CompleteLayerUpload'
+      LifecyclePolicy:
+        LifecyclePolicyText: >
+          {
+            "rules": [
+              {
+                "rulePriority": 1,
+                "description": "Limit to 950 images.",
+                "selection": {
+                  "tagStatus": "any",
+                  "countType": "imageCountMoreThan",
+                  "countNumber": 955
+                },
+                "action": {
+                  "type": "expire"
+                }
+              }
+            ]
+          }
+        RegistryId: '430105358689'
+
