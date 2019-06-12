@@ -10,12 +10,10 @@ pipeline:
     when:
       event: push
 
-  notify:
-    image: plugins/slack
-    webhook: ${SLACK_WEBHOOK}
-    channel: dp_bots
+  test-ecr:
+    image: trinitymirror/drone-cloudformation
+    stackname: newdronetest
+    template: ecr/default.yml
     when:
-      status:
-        - success
-        - failure
+      event: deployment
 
